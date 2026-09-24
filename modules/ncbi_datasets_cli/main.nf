@@ -1,19 +1,21 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.types = true
+
 process NCBI_DATASETS {
     label 'process_low'
     conda 'envs/ncbidatasets_env.yml'
     publishDir params.outdir, mode:'copy'
 
     input:
-    val(GCF)
+    assembly: String
 
     output:
-    path('dataset/**/*.fna')
+    fna: Path = file('dataset/**/*.fna')
 
     shell:
     """ 
-    datasets download genome accession $GCF --include genome
+    datasets download genome accession $assembly --include genome
     unzip ncbi_dataset.zip -d dataset/
     """
 

@@ -1,20 +1,25 @@
 #!/usr/bin/env nextflow
 
-process BUSCO{
+nextflow.enable.types = true
+
+process BUSCO {
     label 'process_high'
     conda 'envs/busco_env.yml'
     publishDir params.outdir, mode:'copy'
 
     input:
-    path(genome)
+    genome: Path
     
     output:
-    path("BUSCO_${genome.baseName}*")
+    busco: Path = file("BUSCO_${genome.baseName}")
 
     shell:
     """ 
     busco -i ${genome} -m genome --cpu $task.cpus -l alteromonas_odb12
-    
     """
-
+    
+    stub:
+    """
+    mkdir BUSCO_${genome.baseName}
+    """
 }

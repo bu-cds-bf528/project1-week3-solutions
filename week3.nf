@@ -16,7 +16,7 @@ include {BUSCO_PLOT} from './modules/busco_plot'
 
 workflow {
 
-    read_pairs_ch = channel.fromPath(params.bac_samples).splitCsv(header: true).map { row -> record(name: row.name, long_reads: file(row.long_reads), short1: file(row.short1), short2: file(row.short2))}
+    read_pairs_ch = channel.fromPath(params.reads).splitCsv(header: true).map { row -> record(name: row.name, long_reads: file(row.nano), short1: file(row.short1), short2: file(row.short2))}
 
     fastqc_ch = read_pairs_ch.flatMap { it -> [record(name: it.name, read: it.short1), record(name: it.name, read: it.short2)]}
     
@@ -36,21 +36,23 @@ workflow {
 
     // THIS WEEK
     // Annotate the polished assembly using Prokka
-    
+    prokka_ch = PROKKA(pilon_ch)
 
     // Run BUSCO on the Polished Assembly
-    
+    busco_ch = BUSCO(pilon_ch)
 
     // Download the canonical reference genome 
-    
+    // Look in the nextflow.config for the variable you need
+    ref_genome = NCBI_DATASETS(params.ref_genome)
 
     // Run QUAST comparing the final assembly with the reference genome
-    
+    quast_final = QUAST(pilon_ch, ref_genome)
 
     // Run QUAST on the unpolished assembly
-
+    quast_unpolished = QUAST_UNPOLISHED(assembly_ch, ref_genome)
 
     // Run BUSCO PLOT on the BUSCO output
+    busco_plot = BUSCO_PLOT(busco_ch)
     
     
 }

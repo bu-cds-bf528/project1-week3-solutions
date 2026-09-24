@@ -1,19 +1,31 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.types = true
+
+record BowtieIndex {
+    name: String
+    index: Path
+}
+
+
 process BOWTIE2_INDEX {
     label 'process_high'
     conda 'envs/bowtie2_env.yml'
-    publishDir params.outdir, mode:'copy'
 
     input:
-    path(consensus)
+    reference: Path
 
     output:
-    tuple val("${consensus.baseName}"), path("bowtie2_index/")
+    idx: BowtieIndex = record(name: reference.baseName, index: file("bowtie2_index/"))
 
-    shell:
+    script:
     """ 
     mkdir bowtie2_index
-    bowtie2-build --threads $task.cpus $consensus bowtie2_index/${consensus.baseName}
+    bowtie2-build $reference bowtie2_index/${reference.baseName} --threads $task.cpus
+    """
+    
+    stub:
+    """
+    mkdir bowtie2_index
     """
 }

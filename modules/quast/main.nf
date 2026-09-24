@@ -1,20 +1,27 @@
 #!/usr/bin/env nextflow
 
-process QUAST{
+nextflow.enable.types = true
+
+process QUAST {
     label 'process_medium'
     conda 'envs/quast_env.yml'
-    publishDir params.outdir, mode:'copy'
+
 
     input:
-    path(genome)
-    path(ref_genome)
+    genome: Path
+    ref_genome: Path
 
     output:
-    path("${genome.baseName}/")
+    quast: Path = file("${genome.baseName}/")
 
     shell:
     """ 
     quast.py -t $task.cpus -r $ref_genome -o $genome.baseName $genome
+    """
+
+    stub:
+    """
+    mkdir ${genome.baseName}
     """
 
 }

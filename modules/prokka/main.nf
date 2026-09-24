@@ -1,18 +1,28 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.types = true
+
 process PROKKA {
     label 'process_single'
     conda "envs/prokka_env.yml"
     publishDir params.outdir
 
     input:
-    path(fa)
+    genome: Path
 
     output:
-    path("**/*.gff"), emit: gff
+    gff: Path = file("**/*.gff")
 
     shell:
     """
-    prokka --cpus 1 --outdir annots/ --prefix genome $fa
+    prokka --cpus 1 --outdir annots/ --prefix genome $genome
     """
+
+    stub:
+    """
+    mkdir annots
+    touch annots/${genome}.gff
+    """
+
+
 }

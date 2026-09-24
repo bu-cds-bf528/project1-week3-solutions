@@ -1,20 +1,34 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.types = true
+
+record BamIdx {
+    name: String
+    bam: Path
+    idx: Path
+
+}
+
 process PILON {
+
     label 'process_high'
     conda 'envs/pilon_env.yml'
-    publishDir params.outdir, mode:'copy'
 
     input:
-    path(genome)
-    path(bam)
+    assembly: Path
+    bamidx: BamIdx
     
     output:
-    path("*sorted.fasta")
+    improved: Path = file('pilon.fasta')
 
-    shell:
+    script:
     """ 
-    pilon --genome $genome --frags $bam --output ${bam.baseName} -Xmx${task.cpus}G
+    pilon --genome $assembly --frags $bamidx.bam -Xmx32G
+    """
+
+    stub:
+    """
+    touch pilon.fasta
     """
 
 }

@@ -1,19 +1,26 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.types = true
+
 process BUSCO_PLOT {
     label 'process_single'
     conda 'envs/busco_env.yml'
-    publishDir params.outdir, mode:'copy'
 
     input:
-    path(busco_results)
+    results: Path
     
     output:
-    path("**/*.png")
+    plot: Path = file("**/*.png")
 
     shell:
     """ 
-    busco --plot $busco_results
+    busco --plot $results
+    """
+
+    stub:
+    """
+    mkdir BUSCO_RESULTS
+    touch BUSCO_RESULTS/plot.png
     """
 
 }

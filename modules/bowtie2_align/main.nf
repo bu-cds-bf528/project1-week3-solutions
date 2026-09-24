@@ -1,20 +1,42 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.types = true
+
+record ShortReads {
+    name: String
+    short1: Path
+    short2: Path
+}
+
+record BamRec {
+    name: String
+    bam: Path
+}
+
+record BowtieIndex {
+    name: String
+    index: Path
+}
+
 process BOWTIE2_ALIGN {
     label 'process_high'
     conda 'envs/bowtie2_env.yml'
-    publishDir params.outdir, mode:'copy'
 
     input:
-    tuple val(name), path(short1), path(short2)
-    tuple val(consensus), path(index)
+    reads: ShortReads
+    idx: BowtieIndex
 
     output:
-    path("${name}.bam")
+    bam: BamRec = record(name: reads.name, bam: file("${reads.name}.bam"))
 
-    shell:
+    script:
     """ 
-    bowtie2 -x bowtie2_index/${consensus} -1 $short1 -2 $short2 | samtools view -bS - > ${name}.bam
+    bowtie2 -x bowtie2_index/${idx.name} -1 ${reads.short1} -2 ${reads.short2} | samtools view -bS - > ${reads.name}.bam
+    """
+
+    stub:
+    """
+    touch ${reads.name}.bam
     """
 
 }

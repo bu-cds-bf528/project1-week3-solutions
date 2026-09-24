@@ -1,20 +1,37 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.types = true
+
+record FastqRead {
+    name: String
+    read: Path
+}
+
+record FastqcReport {
+    html: Path
+    zip: Path
+}
+
+
 process FASTQC {
     label 'process_single'
     conda 'envs/fastqc_env.yml'
-    publishDir params.outdir, mode:'copy', pattern: "*.html"
 
     input:
-    tuple val(name), path(read1), path(read2)
+    reads: FastqRead
 
     output:
-    path("*.html")
-    tuple val(name), path(read1), path(read2), emit: reads
+    report: FastqcReport = record(html: file("*_fastqc.html"), zip: file("*_fastqc.zip"))
 
     script:
-    """ 
-    fastqc $read1 $read2
+    """
+    fastqc $reads.read
+    """
+
+    stub:
+    """
+    touch ${reads.read.baseName}_stub_fastqc.html
+    touch ${reads.read.baseName}_stub_fastqc.zip
     """
 
 }

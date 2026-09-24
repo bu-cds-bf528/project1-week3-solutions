@@ -1,18 +1,29 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.types = true
+
+record FastqRead {
+    name: String
+    read: Path
+}
+
 process FLYE {
-    label 'process_single'
+    label 'process_high'
     conda 'envs/flye_env.yml'
-    publishDir params.outdir, mode:'copy'
 
     input:
-    tuple val(name),path(nano)
+    reads: FastqRead
 
     output:
-    path("assembly.fasta")
+    fasta: Path = file("${reads.name}.assembly.fasta")
 
     script:
     """
-    flye --nano-corr $nano -o .
+    flye --nano-hq $reads.read -o .
+    """
+
+    stub:
+    """
+    touch ${reads.name}.assembly.fasta
     """
 }
