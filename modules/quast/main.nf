@@ -6,7 +6,6 @@ process QUAST {
     label 'process_medium'
     conda 'envs/quast_env.yml'
 
-
     input:
     genome: Path
     ref_genome: Path
@@ -14,7 +13,7 @@ process QUAST {
     output:
     quast: Path = file("${genome.baseName}/")
 
-    shell:
+    script:
     """ 
     quast.py -t $task.cpus -r $ref_genome -o $genome.baseName $genome
     """

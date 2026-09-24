@@ -13,10 +13,16 @@ process NCBI_DATASETS {
     output:
     fna: Path = file('dataset/**/*.fna')
 
-    shell:
+    script:
     """ 
     datasets download genome accession $assembly --include genome
     unzip ncbi_dataset.zip -d dataset/
+    """
+
+    stub:
+    """
+    mkdir -p dataset/ncbi_dataset/data/${assembly}
+    touch dataset/ncbi_dataset/data/${assembly}/${assembly}_genomic.fna
     """
 
 }

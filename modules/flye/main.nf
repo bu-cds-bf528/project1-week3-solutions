@@ -15,7 +15,7 @@ process FLYE {
     reads: FastqRead
 
     output:
-    fasta: Path = file("${reads.name}.assembly.fasta")
+    fasta: Path = file("assembly.fasta")
 
     script:
     """

@@ -12,7 +12,7 @@ process BUSCO_PLOT {
     output:
     plot: Path = file("**/*.png")
 
-    shell:
+    script:
     """ 
     busco --plot $results
     """
