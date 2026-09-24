@@ -126,7 +126,7 @@ include {FLYE} from './modules/flye/main.nf'
 
 workflow {
 
-    read_pairs_ch = channel.of(file(params.reads)).splitCsv(header: true).map { row -> record(name: row.name, long_reads: file(row.long_reads), short1: file(row.short1), short2: file(row.short2))}
+    read_pairs_ch = channel.of(file(params.bac_samples)).splitCsv(header: true).map { row -> record(name: row.name, long_reads: file(row.long_reads), short1: file(row.short1), short2: file(row.short2))}
 
     fastqc_ch = read_pairs_ch.flatMap { it -> [record(name: it.name, read: it.short1), record(name: it.name, read: it.short2)]}
     
