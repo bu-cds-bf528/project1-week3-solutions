@@ -91,7 +91,7 @@ workflow {
     // Run BUSCO on the Polished Assembly
     //   - Input: one genome FASTA (Path)
     //   - Output: a directory named BUSCO_<genome basename>, which BUSCO_PLOT
-    //     will need at the end, so save it in a variable
+    //     will need at the end
     // busco_ch = BUSCO( ??? )
 
 
