@@ -9,8 +9,6 @@ process NCBI_DATASETS {
     // `conda` points to the environment file that provides the tool
     label 'process_low'
     conda 'envs/ncbidatasets_env.yml'
-    // Copy the outputs out of the work directory into params.outdir
-    publishDir params.outdir, mode:'copy'
 
     // An accession string (e.g. params.ref_genome), not a file
     input:
